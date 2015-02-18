@@ -1,0 +1,35 @@
+import Functional
+
+
+idp : {A : Type} -> {a : A} -> a = a
+idp _ a = path (const a)
+
+idp' : {A : Type} -> (a : A) -> a = a
+idp' _ a = path (const a)
+
+transport : {A : Type} (B : A -> Type) {a a' : A} -> a = a' -> B a -> B a'
+transport _ B _ _ p x = coe (\i -> B (p @ i)) left x right
+
+transport-Type1 : {A : Type} (B : A -> Type1) {a a' : A} -> a = a' -> B a -> B a'
+transport-Type1 _ B _ _ p x = coe (\i -> B (p @ i)) left x right
+
+psqueeze : {A : Type} {a a' : A} (p : a = a') (i : I) -> a = p @ i
+psqueeze _ _ _ p i = path (\j -> p @ squeeze i j)
+
+inv : {A : Type} {a a' : A} -> a = a' -> a' = a
+inv _ a _ p = transport (\x -> x = a) p idp
+
+(*) : {A : Type} -> {a a' a'' : A} -> a = a' -> a' = a'' -> a = a''
+(*) _ a _ _ p q = transport (\x -> a = x) q p
+
+pmap : {A B : Type} (f : A -> B) -> {a a' : A} -> a = a' -> f a = f a'
+pmap _ _ f _ _ p = path (\i -> f (p @ i))
+
+
+J1 : {A : Type} {a : A} (B : {a' : A} -> a = a' -> Type) -> B idp -> {a' : A} (p : a = a') -> B p
+J1 _ _ B b _ p = coe (\i -> B (psqueeze p i)) left b right
+
+J2 : {A : Type} (B : (a a' : A) -> a = a' -> Type)
+  -> ({a : A} -> B a a idp)
+  -> {a a' : A} -> (p : a = a') -> B a a' p
+J2 _ B b a a' p = coe (\i -> B a (p @ i) (psqueeze p i)) left b right

@@ -1,0 +1,67 @@
+import Types
+import Homotopy.Cube
+import Homotopy.Equivalence
+import Homotopy.Sphere
+
+
+-- Stupid constructors
+bot_i : (i : Nat) -> i-dCube (succ i)
+bot_i _ = bot
+
+top_i : (i : Nat) -> i-dCube (succ i)
+top_i _ = top
+
+floor_i : (i : Nat) -> I -> i-dCube i -> i-dCube (succ i)
+floor_i _ i c = floor i c
+
+ceiling_i : (i : Nat) -> I -> i-dCube i -> i-dCube (succ i)
+ceiling_i _ i c = ceiling i c
+
+
+-- Useful paths
+via-floor : (i : Nat) -> (x : i-dCube i) -> bot_i i = floor_i i right x
+via-floor _ x = path (\i -> floor i x)
+
+via-surface : (i : Nat) -> (x : i-dCube i) -> floor_i i right x = ceiling_i i right x
+via-surface _ x = path (\i -> surface i x)
+
+via-ceiling : (i : Nat) -> (x : i-dCube i) -> ceiling_i i right x = top_i i
+via-ceiling _ x = inv (path (\i -> ceiling i x))
+
+cube-merid : (i : Nat) -> (x : i-dCube i) -> bot_i i = top_i i
+cube-merid n x = via-floor n x * via-surface n x * via-ceiling n x
+
+
+--
+dCube-to-Sphere : (i : Nat) -> QuaziEquiv (i-dCube i) (i-Sphere i) -> i-dCube (succ i) -> i-Sphere (succ i)
+dCube-to-Sphere _ step (surface i c) = merid i (step.f c)
+dCube-to-Sphere _ _ top = north
+dCube-to-Sphere _ _ (ceiling _ _) = north
+dCube-to-Sphere _ _ bot = south
+dCube-to-Sphere _ _ (floor _ _) = south
+
+Sphere-to-dCube : (i : Nat) -> QuaziEquiv (i-dCube i) (i-Sphere i) -> i-Sphere (succ i) -> i-dCube (succ i)
+Sphere-to-dCube _ _ south = bot
+Sphere-to-dCube _ _ north = top
+Sphere-to-dCube n step (merid i s) = (cube-merid n (step.f-inv.g s)) @ i
+
+cube-sphere-cube : (i : Nat) -> (step : QuaziEquiv (i-dCube i) (i-Sphere i)) -> (x : i-dCube (succ i)) -> Sphere-to-dCube i step (dCube-to-Sphere i step x) = x
+cube-sphere-cube _ _ bot = idp
+cube-sphere-cube n _ (floor i c) = psqueeze (path (\i -> floor i c)) i
+cube-sphere-cube _ _ top = idp
+cube-sphere-cube n _ (ceiling i c) = psqueeze (path (\i -> ceiling i c)) i
+cube-sphere-cube n step (surface i c) = idp  -- TODO
+
+sphere-cube-sphere : (i : Nat) -> (step : QuaziEquiv (i-dCube i) (i-Sphere i)) -> (x : i-Sphere (succ i)) -> dCube-to-Sphere i step (Sphere-to-dCube i step x) = x
+sphere-cube-sphere _ _ south = idp
+sphere-cube-sphere _ _ north = idp
+sphere-cube-sphere n step (merid i s) = true  -- TODO
+
+
+
+dCube-equiv-Sphere-step : (i : Nat) -> QuaziEquiv (i-dCube i) (i-Sphere i) -> QuaziEquiv (i-dCube (succ i)) (i-Sphere (succ i))
+dCube-equiv-Sphere-step n step = quaziEquiv (dCube-to-Sphere n step) (isQuaziEquiv (Sphere-to-dCube n step) (cube-sphere-cube n step) (sphere-cube-sphere n step))
+
+dCube-equiv-Sphere : (i : Nat) -> QuaziEquiv (i-dCube i) (i-Sphere i)
+dCube-equiv-Sphere zero = quaziEquiv id (isQuaziEquiv id idp' idp')
+dCube-equiv-Sphere (succ n) = dCube-equiv-Sphere-step n (dCube-equiv-Sphere n)

@@ -1,0 +1,16 @@
+import Paths
+
+
+data QED = qed
+
+infix 3 !
+(!) : {A : Type} -> (a : A) -> QED -> a = a
+(!) _ _ _ = idp
+
+infix 3 ==<
+(==<) : {A : Type} (a : A) {a' : A} -> a = a' -> a = a'
+(==<) _ _ _ p = p
+
+infixr 2 >==
+(>==) : {A : Type} {a a' a'' : A} -> a = a' -> a' = a'' -> a = a''
+(>==) _ _ _ _ = (*)

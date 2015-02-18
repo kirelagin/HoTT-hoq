@@ -1,0 +1,22 @@
+import Logic
+import Types
+
+
+data Nat = zero | succ Nat
+
+pred : Nat -> Nat
+pred zero = zero
+pred (succ n) = n
+
+(+) : Nat -> Nat -> Nat
+(+) zero m = m
+(+) (succ n) m = succ (n + m)
+
+(<=) : Nat -> Nat -> Prop
+(<=) zero _ = True
+(<=) _ zero = False
+(<=) (succ m) (succ n) = m <= n
+
+plus-zero : (m : Nat) -> m = m + zero
+plus-zero zero = refl
+plus-zero (succ m) = eq-cong succ (plus-zero m)

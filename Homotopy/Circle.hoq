@@ -1,0 +1,23 @@
+import Nat
+import Paths
+import Homotopy.Suspension
+import Types
+
+record Pointed where
+    constructor pointed
+    type : Type
+    base : type
+
+data wedge (A1 A2 : Pointed) = base | inl (A1.type) | inr (A2.type) with
+    base = inl (A1.base)
+    base = inr (A2.base)
+
+data Circle = base | loop I with
+    loop left = base
+    loop right = base
+
+--Circle-elim : (P : Circle -> Type) (b : P base) -> (x : Circle) -> P x
+--Circle-elim P b base     = b
+--Circle-elim P b (loop i) = transport P (coe (\j -> Path (\_ -> Circle) base (loop j)) left refl i) {- : base = loop i -} b
+--    coe  (\j -> Path (\k -> P (loop k)) b (Prop-Contr (transport P (path loop) b) b @ j)) left
+--    (path (\j -> coe (\k -> P (loop k)) left b j)) right @ i

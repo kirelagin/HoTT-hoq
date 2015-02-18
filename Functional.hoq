@@ -1,0 +1,30 @@
+id : {A : Type} -> A -> A
+id _ x = x
+
+const : {A B : Type} -> A -> B -> A
+const _ _ x = \j -> x
+
+infixr 5 $
+($) : {A : Type} {B : A -> Type}
+   -> ((a : A) -> B a)
+   -> (a : A)
+   -> B a
+($) _ _ f x = f x
+
+($$) : {A B : Type}
+    -> (A -> B) -> A -> B
+($$) _ _ f x = f x
+
+flip : (A : Type) (B : Type) (C : A -> B -> Type)
+    -> ((a : A) -> (b : B) -> C a b)
+    -> ((b : B) -> (a : A) -> C a b)
+flip _ _ _ f = \a b -> f b a
+
+compose' : (A B C : Type) -> (B -> C) -> (A -> B) -> A -> C
+compose' A B C = \g f a -> g (f a)
+
+(.) : (A : Type) (B : A -> Type) (C : (a : A) -> B a -> Type)
+   -> (f : (a : A) -> (b : B a) -> C a b)
+   -> (g : (a : A) -> B a)
+   -> ((a : A) -> C a (g a))
+(.) A B C f g = \x -> f x (g x)

@@ -1,0 +1,5 @@
+import Paths
+
+data Susp (A : Type) = north | south | merid I A with
+    merid left _  = south
+    merid right _ = north

@@ -1,0 +1,8 @@
+import Nat
+import Types
+import Homotopy.Suspension
+
+
+i-Sphere : Nat -> Type
+i-Sphere zero = Bool
+i-Sphere (succ n) = Susp (i-Sphere n)

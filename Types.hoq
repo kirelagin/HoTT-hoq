@@ -1,0 +1,27 @@
+import Functional
+import Paths
+
+
+data Bool = true | false
+
+record Sigma (A : Type) (B : A -> Type) where
+   constructor (,)
+   proj1 : A
+   proj2 : B proj1
+
+times : (A B : Type) -> Type
+times A B = Sigma A (\_ -> B)
+
+
+-- Equality properties
+refl : {A : Type} -> {a : A} -> a = a
+refl _ a = path (const a)
+
+eq-cong : {A B : Type} (f : A -> B) -> {a a' : A} -> a = a' -> f a = f a'
+eq-cong _ _ f a _ p = J1 (\x _ -> f a = f x) refl p
+
+eq-sym : {A : Type} -> {a a' : A} -> a = a' -> a' = a
+eq-sym _ a a' p = J2 (\x y _ -> y = x) (\_ -> refl) p
+
+--eq-trans-1 : {A : Type} -> {x y z : A} -> x = y -> y = z -> x = z
+--eq-trans-1 A x y z xy yz = J A (\x y _ -> (x = y -> (y = z -> x = z))) (\x -> (\_ yz -> yz)) x y xy xy yz

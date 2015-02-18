@@ -1,0 +1,13 @@
+import Logic
+import Nat
+
+
+data dCube-Pushout (C : Type) = surface I C | top | ceiling I C | bot | floor I C with
+    ceiling left _ = top
+    surface right c = ceiling right c
+    floor left _ = bot
+    surface left c = floor right c
+
+i-dCube : Nat -> Type
+i-dCube zero = Bool
+i-dCube (succ n) = dCube-Pushout (i-dCube n)
