@@ -16,8 +16,13 @@ data Circle = base | loop I with
     loop left = base
     loop right = base
 
---Circle-elim : (P : Circle -> Type) (b : P base) -> (x : Circle) -> P x
---Circle-elim P b base     = b
---Circle-elim P b (loop i) = transport P (coe (\j -> Path (\_ -> Circle) base (loop j)) left refl i) {- : base = loop i -} b
---    coe  (\j -> Path (\k -> P (loop k)) b (Prop-Contr (transport P (path loop) b) b @ j)) left
---    (path (\j -> coe (\k -> P (loop k)) left b j)) right @ i
+
+Circle-elim' : (P : Circle -> Type) (b : P base) -> Path (\i -> P (loop i)) b b -> (x : Circle) -> P x
+Circle-elim' P b p base     = b
+Circle-elim' P b p (loop i) = p @ i
+
+path-above-loop : (P : Circle -> Type) (b : P base) -> Path (\i -> P (loop i)) b (transport P (path loop) b)
+path-above-loop P b = path (coe (\i -> P (loop i)) left b)
+
+Circle-elim : (P : Circle -> Type) (b : P base) -> transport P (path loop) b = b -> (x : Circle) -> P x
+Circle-elim P b p = Circle-elim' P b (transported-compose (\i -> P (loop i)) (path-above-loop P b) p)
