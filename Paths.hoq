@@ -23,11 +23,6 @@ inv _ a _ p = transport (\x -> x = a) p idp
 (*) _ a _ _ p q = transport (\x -> a = x) q p
 --              === coe (\i -> a = q @ i) left p right
 
-transported-compose : (A : I -> Type) {a : A left} {a' : A right}
-                   -> Path A a (transport A (path id) a) -> transport A (path id) a = a'
-                   -> Path A a a'
-transported-compose A a _ p q = coe (\j -> Path A a (q @ j)) left p right
-
 pmap : {A B : Type} (f : A -> B) -> {a a' : A} -> a = a' -> f a = f a'
 pmap _ _ f _ _ p = path (\i -> f (p @ i))
 
@@ -39,3 +34,25 @@ J2 : {A : Type} (B : (a a' : A) -> a = a' -> Type)
   -> ({a : A} -> B a a idp)
   -> {a a' : A} -> (p : a = a') -> B a a' p
 J2 _ B b a a' p = coe (\i -> B a (p @ i) (psqueeze p i)) left b right
+
+
+Path-over : {A : Type} (B : A -> Type) {a a' : A} -> a = a' -> (b : B a) (b' : B a') -> Type
+Path-over _ B a _ p b b' = transport B p b = b'
+
+-- That’s like a path in the total space of the fibration, but the total space
+-- is restricted to the fibres lying exactly above the given path.
+Path-above : {A : Type} (B : A -> Type) {a a' : A} -> a = a' -> (b : B a) -> Type
+Path-above _ B a _ p b = Path (\i -> B (p @ i)) b (transport B p b)
+
+lift-path : {A : Type} (B : A -> Type) {a a' : A} -> (p : a = a') (b : B a) -> Path-above B p b
+lift-path _ B _ _ p b = path (coe (\i -> B (p @ i)) left b)
+
+path-above-then-over : (A : I -> Type) {a : A left} {a' : A right}
+                    -> Path-above A (path id) a -> Path-over A (path id) a a'
+                    -> Path A a a'
+path-above-then-over A a _ p q = coe (\j -> Path A a (q @ j)) left p right
+
+lift-path-over : {A : Type} (B : A -> Type) {a a' : A} {b : B a} {b' : B a'}
+              -> (p : a = a') -> Path-over B p b b'
+              -> Path (\i -> B (p @ i)) b b'
+lift-path-over _ B a a' b b' p q = path-above-then-over (\i -> B (p @ i)) (lift-path B p b) q
