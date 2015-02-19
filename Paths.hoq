@@ -21,6 +21,7 @@ inv _ a _ p = transport (\x -> x = a) p idp
 
 (*) : {A : Type} -> {a a' a'' : A} -> a = a' -> a' = a'' -> a = a''
 (*) _ a _ _ p q = transport (\x -> a = x) q p
+--              === coe (\i -> a = q @ i) left p right
 
 transported-compose : (A : I -> Type) {a : A left} {a' : A right}
                    -> Path A a (transport A (path id) a) -> transport A (path id) a = a'
