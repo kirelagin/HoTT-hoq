@@ -14,7 +14,7 @@ contradiction : (A B : Prop) -> A -> not A -> B
 contradiction _ B a na = bot-elim B (na a)
 
 contraposition : (A B : Prop) -> (A -> B) -> (not B -> not A)
-contraposition A B = flip (B -> False) (A -> B) (\_ _ -> (A -> False)) (compose' A B False)
+contraposition A B = flip (B -> False) (A -> B) (\_ _ -> (A -> False)) compose'
 
 contraposition-not : (A B : Prop) -> (A -> not B) -> (B -> not A)
 contraposition-not A B = flip A B (\_ _ -> False)
