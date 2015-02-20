@@ -3,6 +3,6 @@ import Types
 import Homotopy.Suspension
 
 
-i-Sphere : Nat -> Type
-i-Sphere zero = Bool
-i-Sphere (succ n) = Susp (i-Sphere n)
+n-Sphere : Nat -> Type
+n-Sphere zero = Bool
+n-Sphere (succ n) = Susp (n-Sphere n)

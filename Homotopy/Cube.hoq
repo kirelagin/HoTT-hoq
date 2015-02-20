@@ -8,6 +8,6 @@ data dCube-Pushout (C : Type) = surface I C | top | ceiling I C | bot | floor I 
     floor left _ = bot
     surface left c = floor right c
 
-i-dCube : Nat -> Type
-i-dCube zero = Bool
-i-dCube (succ n) = dCube-Pushout (i-dCube n)
+n-dCube : Nat -> Type
+n-dCube zero = Bool
+n-dCube (succ n) = dCube-Pushout (n-dCube n)
