@@ -16,6 +16,9 @@ transport-Type1 _ B _ _ p x = coe (\i -> B (p @ i)) left x right
 psqueeze : {A : Type} {a a' : A} (p : a = a') (i : I) -> a = p @ i
 psqueeze _ _ _ p i = path (\j -> p @ squeeze i j)
 
+psqueeze' : {A : Type} {a a' : A} (p : a = a') (i : I) -> p @ i = a'
+psqueeze' _ _ a' p i = coe (\i -> p @ i = a') left p i
+
 inv : {A : Type} {a a' : A} -> a = a' -> a' = a
 inv _ a _ p = transport (\x -> x = a) p idp
 
