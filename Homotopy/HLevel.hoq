@@ -1,0 +1,49 @@
+import Paths
+import Nat
+
+
+isContr : Type -> Type
+isContr A = Sigma A (\a -> (a' : A) -> a = a')
+
+I-isContr : isContr I
+I-isContr = left , (\i -> path (\j -> squeeze i j))
+
+isProp : Type -> Type
+isProp A = (a a' : A) -> a = a'
+
+isSet : Type -> Type
+isSet A = (a a' : A) -> isProp (a = a')
+
+of-hlevel : Nat -> Type -> Type
+of-hlevel zero A = isContr A
+of-hlevel (succ n) A = (a a' : A) -> of-hlevel n (a = a')
+
+h1-prop : (A : Type) -> of-hlevel (succ zero) A -> isProp A
+h1-prop A f a a' = f a a' .proj1
+
+contr-prop : (A : Type) -> isContr A -> isProp A
+contr-prop A ((,) c f) a a' = inv (f a) * f a'
+
+prop-h1 : (A : Type) -> isProp A -> of-hlevel (succ zero) A
+prop-h1 A f a a' = inv (f a a) * f a a', J1 (\x q -> inv (f a a) * f a x = q) (inv-comp (f a a))
+
+prop-set : (A : Type) -> isProp A -> isSet A
+prop-set A p a a' = contr-prop (a = a') (prop-h1 A p a a')
+
+isProp-isProp : (A : Type) -> isProp (isProp A)
+isProp-isProp A f g = path (\i a a' -> prop-set A f a a' (f a a') (g a a') @ i)
+
+Sigma-eq : (A : Type) (B : A -> Type) (a a' : A) (b : B a) (b' : B a') (p : a = a')
+    -> transport B p b = b' -> Path (\_ -> Sigma A B) (a, b) (a', b')
+Sigma-eq A B a a' b b' p = J1
+    (\a' p -> (b' : B a') -> transport B p b = b' -> Path (\_ -> Sigma A B) (a, b) (a', b'))
+    (\b' q -> path (\i -> a, q @ i)) p b'
+
+isContr-isProp : (A : Type) -> isProp (isContr A)
+isContr-isProp A ((,) a1 f1) ((,) a2 f2) = Sigma-eq A (\a -> (a' : A) -> a = a') a1 a2 f1 f2 (f1 a2)
+    (path (\i a' -> prop-set A (contr-prop A (a1, f1)) a2 a'
+        (transport (\a -> (a' : A) -> a = a') (f1 a2) f1 a') (f2 a') @ i))
+
+of-hlevel-isProp : (n : Nat) (A : Type) -> isProp (of-hlevel n A)
+of-hlevel-isProp zero A = isContr-isProp A
+of-hlevel-isProp (succ n) A f g = path (\i a a' -> of-hlevel-isProp n (a = a') (f a a') (g a a') @ i)

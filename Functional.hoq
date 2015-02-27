@@ -1,5 +1,5 @@
 id : {A : Type} -> A -> A
-id _ x = x
+id _ = \x -> x
 
 const : {A B : Type} -> A -> B -> A
 const _ _ x = \j -> x
