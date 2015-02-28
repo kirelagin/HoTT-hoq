@@ -20,11 +20,11 @@ flip : (A : Type) (B : Type) (C : A -> B -> Type)
     -> ((b : B) -> (a : A) -> C a b)
 flip _ _ _ f = \a b -> f b a
 
-compose' : {A B C : Type} -> (B -> C) -> (A -> B) -> A -> C
-compose' _ _ _ = \g f a -> g (f a)
+(.) : {A B C : Type} -> (B -> C) -> (A -> B) -> A -> C
+(.) _ _ _ = \g f a -> g (f a)
 
-(.) : {A : Type} {B : A -> Type} {C : (a : A) -> B a -> Type}
-   -> (f : {a : A} -> (b : B a) -> C a b)
-   -> (g : (a : A) -> B a)
-   -> ((a : A) -> C a (g a))
-(.) _ _ _ f g = \x -> f (g x)
+compose : {A : Type} {B : A -> Type} {C : (a : A) -> B a -> Type}
+       -> (f : {a : A} -> (b : B a) -> C a b)
+       -> (g : (a : A) -> B a)
+       -> ((a : A) -> C a (g a))
+compose _ _ _ f g = \x -> f (g x)
