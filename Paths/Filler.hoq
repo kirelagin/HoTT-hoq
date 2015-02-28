@@ -9,6 +9,8 @@ filler-2 : {A : Type}
 filler-2 _ __ __ __ __ p1 p2 p3 = coe (\i -> p1 @ i = p3 @ i) left p2 right
                                 , path (\j -> coe (\i -> p1 @ i = p3 @ i) left p2 j)
 
+----
+
 filler-2-eq-lem-left : {A : Type}
                     -> {a1 a2 a3 a4 : A}
                     -> (p1 : a2 = a1) (p2 : a2 = a3) (p3 : a3 = a4)
@@ -23,7 +25,7 @@ filler-2-eq-lem-right : {A : Type}
                      -> (p : a1 = a4) -> (p12-p : Path (\k -> a1 = p3 @ k) p12 p)
                      -> p12 * p3 = p
 filler-2-eq-lem-right A a1 a2 a3 p12 p3 p p12-p = coe (\i -> Path (\k -> p12 @ left = psqueeze' p3 i @ k) (p12 * psqueeze p3 i) p)
-                                                   left p12-p right
+                                                      left p12-p right
 
 filler-2-eq-lem : {A : Type}
                -> {a1 a2 a3 a4 : A}
@@ -31,3 +33,16 @@ filler-2-eq-lem : {A : Type}
                -> inv p1 * p2 * p3 = (filler-2 p1 p2 p3).proj1
 filler-2-eq-lem _ _ _ _ _ p1 p2 p3 = filler-2-eq-lem-right (inv p1 * p2) p3 ((filler-2 p1 p2 p3).proj1)
                                                            (filler-2-eq-lem-left p1 p2 p3 ((filler-2 p1 p2 p3).proj1) ((filler-2 p1 p2 p3).proj2))
+
+----
+
+filler-2-glue : {A : Type}
+             -> {a1 a2 a3 a4 : A}
+             -> (p1 : a2 = a1) (p2 : a2 = a3) (p3 : a3 = a4)
+             -> (p4 : a1 = a4)
+             -> (q : inv p1 * p2 * p3 = p4)
+             -> Path (\k -> p1 @ k = p3 @ k) p2 p4
+filler-2-glue _ _ _ _ _ p1 p2 p3 p4 q = coe (\k -> Path (\i -> p1 @ i = p3 @ i) p2 (inv (filler-2-eq-lem p1 p2 p3) * q @ k))
+                                            left
+                                            ((filler-2 p1 p2 p3).proj2)
+                                            right
