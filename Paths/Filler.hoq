@@ -46,3 +46,11 @@ filler-2-glue _ _ _ _ _ p1 p2 p3 p4 q = coe (\k -> Path (\i -> p1 @ i = p3 @ i) 
                                             left
                                             ((filler-2 p1 p2 p3).proj2)
                                             right
+
+
+
+squeeze_ : I -> I -> I
+squeeze_ i j = filler-2-glue idp idp (path id) (path id) (idp-left (path id)) @ i @ j
+
+squeeze'_ : I -> I -> I
+squeeze'_ i j = filler-2-glue (path id) (path id) idp idp (inv-comp (path id)) @ i @ j
