@@ -1,0 +1,33 @@
+import Paths
+import Types
+
+
+filler-2 : {A : Type}
+        -> {a1 a2 a3 a4 : A}
+        -> (p1 : a2 = a1) (p2 : a2 = a3) (p3 : a3 = a4)
+        -> Sigma (a1 = a4) (\p -> Path (\k -> p1 @ k = p3 @ k) p2 p)
+filler-2 _ __ __ __ __ p1 p2 p3 = coe (\i -> p1 @ i = p3 @ i) left p2 right
+                                , path (\j -> coe (\i -> p1 @ i = p3 @ i) left p2 j)
+
+filler-2-eq-lem-left : {A : Type}
+                    -> {a1 a2 a3 a4 : A}
+                    -> (p1 : a2 = a1) (p2 : a2 = a3) (p3 : a3 = a4)
+                    -> (p : a1 = a4) -> (p2-p : Path (\k -> p1 @ k = p3 @ k) p2 p)
+                    -> Path (\k -> a1 = p3 @ k) (inv p1 * p2) p
+filler-2-eq-lem-left _ _ _ _ _ p1 p2 p3 p p2-p = coe (\i -> Path (\k -> psqueeze' p1 i @ k = p3 @ k) (inv (psqueeze p1 i) * p2) p)
+                                                     left (comp-rightdep (\k -> p1 @ k = p3 @ k) (idp-left p2) p2-p) right
+
+filler-2-eq-lem-right : {A : Type}
+                     -> {a1 a3 a4 : A}
+                     -> (p12 : a1 = a3) (p3 : a3 = a4)
+                     -> (p : a1 = a4) -> (p12-p : Path (\k -> a1 = p3 @ k) p12 p)
+                     -> p12 * p3 = p
+filler-2-eq-lem-right A a1 a2 a3 p12 p3 p p12-p = coe (\i -> Path (\k -> p12 @ left = psqueeze' p3 i @ k) (p12 * psqueeze p3 i) p)
+                                                   left p12-p right
+
+filler-2-eq-lem : {A : Type}
+               -> {a1 a2 a3 a4 : A}
+               -> (p1 : a2 = a1) (p2 : a2 = a3) (p3 : a3 = a4)
+               -> inv p1 * p2 * p3 = (filler-2 p1 p2 p3).proj1
+filler-2-eq-lem _ _ _ _ _ p1 p2 p3 = filler-2-eq-lem-right (inv p1 * p2) p3 ((filler-2 p1 p2 p3).proj1)
+                                                           (filler-2-eq-lem-left p1 p2 p3 ((filler-2 p1 p2 p3).proj1) ((filler-2 p1 p2 p3).proj2))

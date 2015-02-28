@@ -17,7 +17,8 @@ psqueeze : {A : Type} {a a' : A} (p : a = a') (i : I) -> a = p @ i
 psqueeze _ _ _ p i = path (\j -> p @ squeeze i j)
 
 psqueeze' : {A : Type} {a a' : A} (p : a = a') (i : I) -> p @ i = a'
-psqueeze' _ _ a' p i = coe (\i -> p @ i = a') left p i
+psqueeze' _ _ _ p i = path (\j -> p @ squeeze' i j)
+
 
 inv : {A : Type} {a a' : A} -> a = a' -> a' = a
 inv _ a _ p = transport (\x -> x = a) p idp
@@ -26,8 +27,17 @@ inv _ a _ p = transport (\x -> x = a) p idp
 (*) _ a _ _ p q = transport (\x -> a = x) q p
 --              === coe (\i -> a = q @ i) left p right
 
+idp-left : {A : Type} -> {a a' : A} -> (p : a = a') -> idp * p = p
+idp-left _ _ _ p = coe (\i -> idp * psqueeze p i = psqueeze p i) left idp right
+
 inv-comp : {A : Type} {a a' : A} (p : a = a') -> inv p * p = idp
 inv-comp _ _ _ p = coe (\i -> inv (psqueeze p i) * (psqueeze p i) = idp) left idp right
+
+comp-rightdep : (A : I -> Type) {a a' : A left} {b : A right}
+             -> (p : a = a') (q : Path A a' b)
+             -> Path A a b
+comp-rightdep A _ _ b p q = coe (\i -> Path A (p @ i) b) right q left
+
 
 pmap : {A B : Type} (f : A -> B) -> {a a' : A} -> a = a' -> f a = f a'
 pmap _ _ f _ _ p = path (\i -> f (p @ i))
