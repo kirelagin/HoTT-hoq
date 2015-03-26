@@ -3,10 +3,10 @@ import Homotopy.Equivalence
 import Homotopy.HLevel
 
 
-data GSusp (A B : Type) (f : A -> B) = cyl A I | west B | east B
+data GSusp (A B : Type) (f : A -> B) = side A I | west B | east B
   with
-    cyl a left  = west (f a)
-    cyl a right = east (f a)
+    side a left  = west (f a)
+    side a right = east (f a)
 
 west' : (A B : Type) (f : A -> B) -> B -> GSusp A B f
 west' A B f = west
@@ -17,7 +17,7 @@ east' A B f = east
 GSusp-on-contr-merid : {A : Type}
                     -> {B : Type} -> (cB : isContr B) -> (f : A -> B )
                     -> A -> Path (\i -> GSusp A B f) (west (cB.proj1)) (east (cB.proj1))
-GSusp-on-contr-merid A B cB f a = pmap west (cB.proj2 (f a)) * path (cyl a) * pmap east (inv (cB.proj2 (f a)))
+GSusp-on-contr-merid A B cB f a = pmap west (cB.proj2 (f a)) * path (side a) * inv (pmap east (cB.proj2 (f a)))
 
 GSusp-on-contr-f : {A : Type}
                 -> {B  : Type} -> isContr B  -> (f  : A -> B )
@@ -25,16 +25,16 @@ GSusp-on-contr-f : {A : Type}
                 -> GSusp A B f -> GSusp A B' f'
 GSusp-on-contr-f _ _ __ _ __ cB' __ (west _) = west (cB'.proj1)
 GSusp-on-contr-f _ _ __ _ __ cB' __ (east _) = east (cB'.proj1)
-GSusp-on-contr-f A B cB f B' cB' f' (cyl a i) = GSusp-on-contr-merid cB' f' a @ i
+GSusp-on-contr-f A B cB f B' cB' f' (side a i) = GSusp-on-contr-merid cB' f' a @ i
 
 
 lem : {A : Type}
    -> {B  : Type} -> (cB  : isContr B ) -> (f  : A -> B )
    -> {B' : Type} -> (cB' : isContr B') -> (f' : A -> B')
    -> (a : A)
-   -> inv (pmap (GSusp-on-contr-f cB' f' cB f . GSusp-on-contr-f cB f cB' f') (path (cyl a)))
+   -> inv (path (\i -> (GSusp-on-contr-f cB' f' cB f . GSusp-on-contr-f cB f cB' f' . side a) i))
       * pmap west (cB.proj2 (f a))
-      * path (cyl a) = pmap east (cB.proj2 (f a))
+      * path (side a) = pmap east (cB.proj2 (f a))
 lem _ _ cB f _ cB' f' a = _
 
 GSusp-on-contr-f-inv : {A : Type}
@@ -44,18 +44,18 @@ GSusp-on-contr-f-inv : {A : Type}
                     -> GSusp-on-contr-f cB' f' cB f (GSusp-on-contr-f cB f cB' f' x) = x
 GSusp-on-contr-f-inv _ _ cB _ __ ___ __ (west b) = pmap west (cB.proj2 b)
 GSusp-on-contr-f-inv _ _ cB _ __ ___ __ (east b) = pmap east (cB.proj2 b)
-GSusp-on-contr-f-inv A B cB f B' cB' f' (cyl a i) = filler-2-glue (pmap (GSusp-on-contr-f cB' f' cB f . GSusp-on-contr-f cB f cB' f') (path (cyl a)))
-                                                                  (pmap west (cB.proj2 (f a)))
-                                                                  (path (cyl a))
-                                                                  (pmap east (cB.proj2 (f a)))
-                                                                  (lem cB f cB' f' a)
-                                                    @ i
+GSusp-on-contr-f-inv A B cB f B' cB' f' (side a i) = filler-2-glue (pmap (GSusp-on-contr-f cB' f' cB f . GSusp-on-contr-f cB f cB' f') (path (side a)))
+                                                                   (pmap west (cB.proj2 (f a)))
+                                                                   (path (side a))
+                                                                   (pmap east (cB.proj2 (f a)))
+                                                                   (lem cB f cB' f' a)
+                                                     @ i
 
 GSusp-on-contr-equiv : {A : Type}
                     -> {B  : Type} -> (cB  : isContr B ) -> (f  : A -> B )
                     -> {B' : Type} -> (cB' : isContr B') -> (f' : A -> B')
                     -> QuaziEquiv (GSusp A B f) (GSusp A B' f')
 GSusp-on-contr-equiv _ _ cB f _ cB' f' = quaziEquiv (GSusp-on-contr-f cB f cB' f')
-                                                    (isQuaziEquiv (GSusp-on-contr-f cB' f' cB f)
-                                                                  (GSusp-on-contr-f-inv cB f cB' f')
-                                                                  (GSusp-on-contr-f-inv cB' f' cB f))
+                                                    (isF-inverse (GSusp-on-contr-f cB' f' cB f)
+                                                                 (GSusp-on-contr-f-inv cB f cB' f')
+                                                                 (GSusp-on-contr-f-inv cB' f' cB f))
