@@ -1,2 +1,0 @@
-data Pushout (L M R : Type)(fl : M -> L) (fr : M -> R) =
-        pushl L | pushr R with
