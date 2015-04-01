@@ -1,12 +1,15 @@
 import Functional
 import Paths
 
+
 data Empty
 empty-elim : {A : Type} -> Empty -> A
 empty-elim _ ()
 
+
 data One = unit
 data Bool = true | false
+
 
 infixr 4 ,
 record Sigma (A : Type) (B : A -> Type) where
@@ -14,8 +17,27 @@ record Sigma (A : Type) (B : A -> Type) where
    proj1 : A
    proj2 : B proj1
 
+
+record Sigma-T1 (A : Type1) (B : A -> Type1) where
+   constructor (,)
+   proj1 : A
+   proj2 : B proj1
+
+
 times : (A B : Type) -> Type
 times A B = Sigma A (\_ -> B)
+
+
+data x (A B : Type) = cons A B
+
+fst : {A B : Type} -> A `x` B -> A
+fst _ _ (cons a _) = a
+
+snd : {A B : Type} -> A `x` B -> B
+snd _ _ (cons _ b) = b
+
+
+data plus (A B : Type) = inl A | inr B
 
 
 -- Equality properties
