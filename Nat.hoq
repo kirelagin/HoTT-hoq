@@ -4,6 +4,19 @@ import Types
 
 data Nat = zero | succ Nat
 
+n_0 : Nat
+n_0 = zero
+
+n_1 : Nat
+n_1 = succ n_0
+
+n_2 : Nat
+n_2 = succ n_1
+
+n_3 : Nat
+n_3 = succ n_2
+
+
 pred : Nat -> Nat
 pred zero = zero
 pred (succ n) = n
