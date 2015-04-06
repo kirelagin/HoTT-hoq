@@ -13,6 +13,14 @@ record QuaziEquiv (A B : Type) where
   f : A -> B
   f-inv: F-inverse f
 
+
+id-QuaziEquiv : {A : Type} -> QuaziEquiv A A
+id-QuaziEquiv _ = quaziEquiv id (isF-inverse id (\_ -> idp) (\_ -> idp))
+
+QuaziEquiv-inv : {A B : Type} -> QuaziEquiv A B -> QuaziEquiv B A
+QuaziEquiv-inv _ _ (quaziEquiv f (isF-inverse g h1 h2)) = quaziEquiv g (isF-inverse f h2 h1)
+
+
 quaziEquiv-to-path : {A B : Type} -> QuaziEquiv A B -> A = B
 quaziEquiv-to-path A B e = path (\i -> iso A B (e.f) (e.f-inv.g) (e.f-inv.f-then-g) (e.f-inv.g-then-f) i)
 

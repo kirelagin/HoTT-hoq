@@ -46,6 +46,9 @@ pmap _ _ f _ _ p = path (\i -> f (p @ i))
 J1 : {A : Type} {a : A} (B : {a' : A} -> a = a' -> Type) -> B idp -> {a' : A} (p : a = a') -> B p
 J1 _ _ B b _ p = coe (\i -> B (psqueeze p i)) left b right
 
+J1-T1 : {A : Type1} {a : A} (B : {a' : A} -> a = a' -> Type1) -> B idp -> {a' : A} (p : a = a') -> B p
+J1-T1 A a B b a' p = coe (\i -> B (psqueeze p i)) left b right
+
 J : {A : Type} (B : (a a' : A) -> a = a' -> Type)
  -> ({a : A} -> B a a idp)
  -> {a a' : A} -> (p : a = a') -> B a a' p

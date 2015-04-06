@@ -16,6 +16,9 @@ n_2 = succ n_1
 n_3 : Nat
 n_3 = succ n_2
 
+n_4 : Nat
+n_4 = succ n_3
+
 
 pred : Nat -> Nat
 pred zero = zero

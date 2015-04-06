@@ -66,7 +66,7 @@ isContr-lem : {B : Type} -> isContr B -> {B' : Type} -> isContr B' -> B = B'
 isContr-lem B c B' c' = path (iso B B' (\_ -> c'.proj1) (\_ -> c.proj1) (c.proj2) (c'.proj2))
 
 GSusp-lem-any-f : {A : Type}
-               -> {B  : Type} -> isContr B
+               -> {B : Type} -> isContr B
                -> (f f' : A -> B )
                -> GSusp A B f = GSusp A B f'
 GSusp-lem-any-f A B c f f' = path (\i -> GSusp A B (\a -> contr-prop B c (f a) (f' a) @ i))

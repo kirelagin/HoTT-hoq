@@ -8,6 +8,9 @@ empty-elim _ ()
 
 
 data One = unit
+One-all-eq : (x : One) -> unit = x
+One-all-eq unit = idp
+
 data Bool = true | false
 
 

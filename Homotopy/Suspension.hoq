@@ -1,5 +1,25 @@
+import Types
 import Paths
+--import Pushout
+import Homotopy.GeneralisedSuspension
 
-data Susp (A : Type) = north | south | merid I A with
-    merid left _  = south
-    merid right _ = north
+--Susp : Type -> Type
+--Susp A = Pushout A One One (\_ -> unit) (\_ -> unit)
+Susp : Type -> Type
+Susp A = GSusp A One (\_ -> unit)
+
+Susp-of-equiv-f : {A A' : Type} -> QuaziEquiv A A'
+               -> (Susp A -> Susp A')
+Susp-of-equiv-f _ _ e (west unit) = west unit
+Susp-of-equiv-f _ _ e (east unit) = east unit
+Susp-of-equiv-f _ _ e (side a i)  = side (e.f a) i
+
+Susp-of-equiv-f-inv : {A A' : Type} -> (e : QuaziEquiv A A')
+               -> (x : Susp A) -> Susp-of-equiv-f (QuaziEquiv-inv e) (Susp-of-equiv-f e x) = x
+Susp-of-equiv-f-inv _ _ e (west unit) = idp
+Susp-of-equiv-f-inv _ _ e (east unit) = idp
+Susp-of-equiv-f-inv _ _ e (side a i)  = pmap (\x -> side x i) (e.f-inv.f-then-g a)
+
+Susp-of-equiv-equiv : {A A' : Type} -> QuaziEquiv A A'
+                   -> QuaziEquiv (Susp A) (Susp A')
+Susp-of-equiv-equiv _ _ e = _

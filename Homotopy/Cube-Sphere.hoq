@@ -1,84 +1,36 @@
-import Types
+import Paths
 import Homotopy.Cube
 import Homotopy.Equivalence
+import Homotopy.HLevel
 import Homotopy.Sphere
 
 
--- Stupid constructors
-bot_i : (n : Nat) -> n-dCube n
-bot_i zero = false
-bot_i (succ _) = bot
+One-isContr : isContr One
+One-isContr = unit , One-all-eq
 
-top_i : (n : Nat) -> n-dCube n
-top_i zero = true
-top_i (succ _) = top
+sn-Cube-all-eq : (n : Nat) -> (c : isContr (n-Cube n))
+              -> (x : n-Cube (succ n)) -> west' (n-Cube n) (n-Cube n) id (c.proj1) = x
+sn-Cube-all-eq n c (west x)   = idp
+                              * pmap west (c.proj2 x)
+sn-Cube-all-eq n c (east x)   = path (side (c.proj1))
+                              * pmap east (c.proj2 x)
+sn-Cube-all-eq n c (side x i) = psqueeze (path (side (c.proj1))) i
+                              * pmap (\z -> side z i) (c.proj2 x)
 
-floor_i : (n : Nat) -> I -> n-dCube n -> n-dCube (succ n)
-floor_i _ i c = floor i c
-
-ceiling_i : (n : Nat) -> I -> n-dCube n -> n-dCube (succ n)
-ceiling_i _ i c = ceiling i c
-
-
--- Useful paths
-via-floor : (n : Nat) -> (x : n-dCube n) -> bot_i (succ n) = floor_i n right x
-via-floor _ x = path (\i -> floor i x)
-
-via-surface : (n : Nat) -> (x : n-dCube n) -> floor_i n right x = ceiling_i n right x
-via-surface _ x = path (\i -> surface i x)
-
-via-ceiling-inv : (n : Nat) -> (x : n-dCube n) -> top_i (succ n) = ceiling_i n right x
-via-ceiling-inv _ x = path (\i -> ceiling i x)
-
-via-ceiling : (n : Nat) -> (x : n-dCube n) -> ceiling_i n right x = top_i (succ n)
-via-ceiling n x = inv (via-ceiling-inv n x)
-
-via-ceiling-rev : (n : Nat) -> (x : n-dCube n) -> (i : I) -> ceiling_i n right x = ceiling_i n i x
-via-ceiling-rev n x i = inv (psqueeze' (via-ceiling-inv n x) i)
-
-cube-merid : (n : Nat) -> (x : n-dCube n) -> bot_i (succ n) = top_i (succ n)
-cube-merid n x = via-floor n x * via-surface n x * via-ceiling n x
+n-Cube-isContr : (n : Nat) -> isContr (n-Cube n)
+n-Cube-isContr zero = One-isContr
+n-Cube-isContr (succ n) = west ((n-Cube-isContr n).proj1) , sn-Cube-all-eq n (n-Cube-isContr n)
 
 
---
-dCube-to-Sphere : (i : Nat) -> QuaziEquiv (n-dCube i) (n-Sphere i) -> n-dCube (succ i) -> n-Sphere (succ i)
-dCube-to-Sphere _ _ top = north
-dCube-to-Sphere _ _ (ceiling _ _) = north
-dCube-to-Sphere _ _ (surface _ _) = north
-dCube-to-Sphere _ step (floor i c) = merid i (step.f c)
-dCube-to-Sphere _ _ bot = south
+n-Pyramid : Nat -> (Nat -> Type) -> Type
+n-Pyramid zero _ = Empty
+n-Pyramid (succ n) A = GSusp (A n) One (\_ -> unit)
 
-Sphere-to-dCube : (i : Nat) -> QuaziEquiv (n-dCube i) (n-Sphere i) -> n-Sphere (succ i) -> n-dCube (succ i)
-Sphere-to-dCube _ _ north = top
-Sphere-to-dCube n step (merid i s) = (cube-merid n (step.f-inv.g s)) @ i
-Sphere-to-dCube _ _ south = bot
+n-Sphere-dCube-equiv : (n : Nat) -> QuaziEquiv (n-Pyramid n n-dCube) (n-dCube n)
+n-Sphere-dCube-equiv zero = id-QuaziEquiv
+n-Sphere-dCube-equiv (succ n) = GSusp-on-contr-equiv One-isContr (\_ -> unit)
+                                                     (n-Cube-isContr n) (n-dCube-emb n)
 
-cube-sphere-cube : (n : Nat) -> (step : QuaziEquiv (n-dCube n) (n-Sphere n)) -> (x : n-dCube (succ n)) -> Sphere-to-dCube n step (dCube-to-Sphere n step x) = x
-cube-sphere-cube n step top           = inv (cube-merid n (step.f-inv.g (step.f (bot_i n))))
-                                      * via-floor n (bot_i n)
-                                      * via-surface n (bot_i n)
-                                      * via-ceiling n (bot_i n)
-cube-sphere-cube n step (ceiling i c) = inv (cube-merid n (step.f-inv.g (step.f c)))
-                                      * via-floor n c
-                                      * via-surface n c
-                                      * via-ceiling-rev n c i
-cube-sphere-cube n step (surface i c) = inv (cube-merid n (step.f-inv.g (step.f c)))
-                                      * via-floor n c
-                                      * psqueeze (via-surface n c) i
-                                      * idp
-cube-sphere-cube n step (floor i c)   = inv (psqueeze (cube-merid n (step.f-inv.g (step.f c))) i)
-                                      * psqueeze (via-floor n c) i
-                                      * idp
-cube-sphere-cube n step bot           = idp
-
-
---sphere-cube-sphere : (n : Nat) -> (step : QuaziEquiv (n-dCube n) (n-Sphere n)) -> (x : n-Sphere (succ n)) -> dCube-to-Sphere n step (Sphere-to-dCube n step x) = x
---
---
---
---dCube-equiv-Sphere-step : (n : Nat) -> QuaziEquiv (n-dCube n) (n-Sphere n) -> QuaziEquiv (n-dCube (succ n)) (n-Sphere (succ n))
---dCube-equiv-Sphere-step n step = quaziEquiv (dCube-to-Sphere n step) (isQuaziEquiv (Sphere-to-dCube n step) (cube-sphere-cube n step) (sphere-cube-sphere n step))
---
---dCube-equiv-Sphere : (n : Nat) -> QuaziEquiv (n-dCube n) (n-Sphere n)
---dCube-equiv-Sphere zero = quaziEquiv id (isQuaziEquiv id idp' idp')
---dCube-equiv-Sphere (succ n) = dCube-equiv-Sphere-step n (dCube-equiv-Sphere n)
+n-Sphere-n-Pyramid-equiv : (A : Nat -> Type) -> ((m : Nat) -> QuaziEquiv (n-Sphere m) (A m))
+                        -> (n : Nat) -> QuaziEquiv (n-Sphere n) (n-Pyramid n A)
+n-Sphere-n-Pyramid-equiv _ _ zero = id-QuaziEquiv

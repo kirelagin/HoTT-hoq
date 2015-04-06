@@ -1,13 +1,31 @@
-import Logic
 import Nat
+import Homotopy.GeneralisedSuspension
 
 
-data dCube-Pushout (C : Type) = surface I C | top | ceiling I C | bot | floor I C with
-    ceiling left _ = top
-    surface right c = ceiling right c
-    floor left _ = bot
-    surface left c = floor right c
+s-emb : (A B : Type) -> (f : A -> B) -> (GSusp A B f -> GSusp B B id)
+s-emb _ _ _ (west x)  = west x
+s-emb _ _ _ (east x)  = east x
+s-emb _ _ f (side x i) = side (f x) i
+
+n-Cube-dCube : Nat -> Sigma-T1 Type (\A -> Sigma-T1 Type (\B -> B -> A))
+n-Cube-dCube zero = One , (Empty , empty-elim)
+n-Cube-dCube (succ n) = GSusp ((n-Cube-dCube n).proj1)
+                              ((n-Cube-dCube n).proj1)
+                              id
+                        ,
+                        GSusp ((n-Cube-dCube n).proj2.proj1)
+                              ((n-Cube-dCube n).proj1)
+                              ((n-Cube-dCube n).proj2.proj2)
+                        ,
+                        s-emb ((n-Cube-dCube n).proj2.proj1)
+                              ((n-Cube-dCube n).proj1)
+                              ((n-Cube-dCube n).proj2.proj2)
+
+n-Cube : Nat -> Type
+n-Cube n = (n-Cube-dCube n).proj1
 
 n-dCube : Nat -> Type
-n-dCube zero = Bool
-n-dCube (succ n) = dCube-Pushout (n-dCube n)
+n-dCube n = (n-Cube-dCube n).proj2.proj1
+
+n-dCube-emb : (n : Nat) -> (n-dCube n -> n-Cube n)
+n-dCube-emb n = (n-Cube-dCube n).proj2.proj2

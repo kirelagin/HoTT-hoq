@@ -4,5 +4,9 @@ import Homotopy.Suspension
 
 
 n-Sphere : Nat -> Type
-n-Sphere zero = Bool
+n-Sphere zero = Empty
 n-Sphere (succ n) = Susp (n-Sphere n)
+
+n-Disc : Nat -> Type
+n-Disc zero = One
+n-Disc (succ n) = Susp (n-Disc n)
