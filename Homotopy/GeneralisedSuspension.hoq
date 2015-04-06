@@ -14,6 +14,9 @@ west' A B f = west
 east' : (A B : Type) (f : A -> B) -> B -> GSusp A B f
 east' A B f = east
 
+side' : (A B : Type) (f : A -> B) -> A -> I -> GSusp A B f
+side' A B f = side
+
 GSusp-on-contr-merid : {A : Type}
                     -> {B : Type} -> (cB : isContr B) -> (f : A -> B )
                     -> A -> Path (\i -> GSusp A B f) (west (cB.proj1)) (east (cB.proj1))

@@ -14,11 +14,19 @@ Susp-of-equiv-f _ _ e (west unit) = west unit
 Susp-of-equiv-f _ _ e (east unit) = east unit
 Susp-of-equiv-f _ _ e (side a i)  = side (e.f a) i
 
+ttt1 : {A A' : Type} -> (e : QuaziEquiv A A')
+   -> (a : A) (i : I) -> side' A One (\_ -> unit) (e.f-inv.g (e.f a)) i = side a i
+ttt1 _ _ e a i = pmap (\x -> side x i) (e.f-inv.f-then-g a)
+
+ttt2 : {A A' : Type} -> (e : QuaziEquiv A A')
+   -> (a : A) (i : I) -> side' A One (\_ -> unit) ((QuaziEquiv-inv e).f (e.f a)) i = side a i
+ttt2 _ _ e a i = pmap (\x -> side x i) (e.f-inv.f-then-g a)
+
 Susp-of-equiv-f-inv : {A A' : Type} -> (e : QuaziEquiv A A')
                -> (x : Susp A) -> Susp-of-equiv-f (QuaziEquiv-inv e) (Susp-of-equiv-f e x) = x
 Susp-of-equiv-f-inv _ _ e (west unit) = idp
 Susp-of-equiv-f-inv _ _ e (east unit) = idp
-Susp-of-equiv-f-inv _ _ e (side a i)  = pmap (\x -> side x i) (e.f-inv.f-then-g a)
+Susp-of-equiv-f-inv _ _ e (side a i)  = _
 
 Susp-of-equiv-equiv : {A A' : Type} -> QuaziEquiv A A'
                    -> QuaziEquiv (Susp A) (Susp A')
